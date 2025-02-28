@@ -5,7 +5,7 @@ from nonebot.adapters.onebot.v11 import GroupBanNoticeEvent, GroupDecreaseNotice
 from nonebot.rule import is_type
 from nonebot_plugin_alconna import on_alconna, Match, Alconna, Args, Subcommand
 
-from infinity import check_level
+from infinity import check_level, message_occurred
 from infinity.infinity_api_v1 import inf_mai_help, inf_mai_id, inf_mai_song, inf_mai_chart, inf_mai_chage, \
     inf_mai_what_song, inf_mai_search, inf_mai_artist, inf_mai_bpm, inf_mai_decimal, inf_mai_total, inf_mai_level, \
     inf_mai_seek_aliases, inf_mai_roll, inf_mai_roll_by_decimal, inf_mai_roll_by_level, inf_mai_plate_song_list_v1, \
@@ -183,12 +183,14 @@ level_process_cmd = on_alconna(
 @mai_command.handle()
 async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: Arparma):
     # 命令mai help
+    message_occurred()
     if result.find("help"):
         m = await inf_mai_help()
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.text(m.build()))
 
     # 命令mai id
     elif result.find("id"):
+        message_occurred()
         m = await inf_mai_id(result.query[int]("id.music_id"))
         if m.status:
             await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.image(m.get_image()))
@@ -197,6 +199,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai song
     if result.find("song"):
+        message_occurred()
         m = await inf_mai_song(result.query[int]("song.music_id"))
         if m.status:
             await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.image(m.get_image()) + MessageSegment.text(m.build()))
@@ -205,6 +208,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai chart
     if result.find("chart"):
+        message_occurred()
         m = await inf_mai_chart(result.query[str]("chart.difficulty"), result.query[int]("chart.music_id"))
         if m.status:
             await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.image(m.get_image()) + MessageSegment.text(m.build()))
@@ -213,6 +217,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 查歌
     if result.find("查歌"):
+        message_occurred()
         m = await inf_mai_chage(result.query[str]("查歌.keyword"))
         if m.status:
             if m.is_paged:
@@ -226,6 +231,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai search
     if result.find("search"):
+        message_occurred()
         m = await inf_mai_search(result.query[str]("search.keyword"))
         if m.status:
             if m.is_paged:
@@ -239,6 +245,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 曲师查歌
     if result.find("曲师查歌"):
+        message_occurred()
         m = await inf_mai_artist(result.query[str]("曲师查歌.keyword"))
         if m.status:
             if m.is_paged:
@@ -252,6 +259,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai BPM查歌
     if result.find("BPM查歌"):
+        message_occurred()
         m = await inf_mai_bpm(result.query[int]("BPM查歌.bpm"))
         if m.status:
             if m.is_paged:
@@ -265,6 +273,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 定数查歌
     if result.find("定数查歌"):
+        message_occurred()
         difficulty = result.query[str]("定数查歌.difficulty")
         m = await inf_mai_decimal(difficulty, result.query[float]("定数查歌.decimal"))
         if m.status:
@@ -279,6 +288,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 等级查歌
     if result.find("等级查歌"):
+        message_occurred()
         difficulty = result.query[str]("等级查歌.difficulty")
         m = await inf_mai_level(difficulty, result.query[str]("等级查歌.level"))
         if m.status:
@@ -293,6 +303,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 物量查歌
     if result.find("物量查歌"):
+        message_occurred()
         m = await inf_mai_total(result.query[int]("物量查歌.total_notes"))
         if m.status:
             if m.is_paged:
@@ -306,11 +317,13 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 查看别名
     if result.find("查看别名"):
+        message_occurred()
         m = await inf_mai_seek_aliases(result.query[int]("查看别名.music_id"))
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.text(m.build()))
 
     # 命令mai 随歌
     if result.find("随歌"):
+        message_occurred()
         m = await inf_mai_roll()
         if m.status:
             await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.image(m.get_image()) + MessageSegment.text(m.build()))
@@ -319,6 +332,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 定数随歌
     if result.find("定数随歌"):
+        message_occurred()
         difficulty = result.query[str]("定数随歌.difficulty")
         if not difficulty:
             difficulty = ""
@@ -330,6 +344,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 等级随歌
     if result.find("等级随歌"):
+        message_occurred()
         difficulty = result.query[str]("等级随歌.difficulty")
         if not difficulty:
             difficulty = ""
@@ -341,20 +356,24 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 定数表
     if result.find("定数表"):
+        message_occurred()
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.text("🚧施工中~"))
 
     # 命令mai 牌子条件
     if result.find("牌子条件"):
+        message_occurred()
         m = await inf_mai_plate_requirement()
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.image(m.get_image()))
 
     # 命令mai ra计算
     if result.find("ra计算"):
+        message_occurred()
         m = await inf_mai_ra_calculating(result.query[float]("ra计算.decimal"), result.query[float]("ra计算.acc"))
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.text(m.build()))
 
     # 命令mai 分数线
     if result.find("分数线"):
+        message_occurred()
         difficulty = result.query[str]("分数线.difficulty")
         if difficulty == "":
             difficulty = "紫"
@@ -366,28 +385,34 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 段位认定
     if result.find("段位认定"):
+        message_occurred()
         m = await inf_mai_course()
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.image(m.get_image()))
 
     # 命令mai 真段位认定
     if result.find("真段位认定"):
+        message_occurred()
         m = await inf_mai_shincourse()
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.image(m.get_image()))
 
     # 命令mai 随机段位认定
     if result.find("随机段位认定"):
+        message_occurred()
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.text("🚧施工中~"))
 
     # 命令mai 友人对战
     if result.find("友人对战"):
+        message_occurred()
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.text("🚧施工中~"))
 
     # 命令mai 查找机厅
     if result.find("查找机厅"):
+        message_occurred()
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.text("🚧施工中~"))
 
     # 命令mai b50
     if result.find("b50"):
+        message_occurred()
         username = result.query[str]("b50.username")
         friend_code = result.query[str]("b50.friend_code")
         is_lxns = True if result.find("b50.lxns") else False
@@ -404,6 +429,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai ap50
     if result.find("ap50"):
+        message_occurred()
         username = result.query[str]("ap50.username")
         friend_code = result.query[str]("ap50.friend_code")
         is_lxns = True if result.find("ap50.lxns") else False
@@ -420,10 +446,12 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai 等级进度。
     if result.find("等级进度"):
+        message_occurred()
         await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.text("🚧施工中~"))
 
     # 命令mai 分数列表
     if result.find("分数列表"):
+        message_occurred()
         page = result.query[int]("分数列表.page.page")
         m = await inf_mai_level_score_list_v1(str(event.user_id), result.query[str]("分数列表.level"), page)
         if m.status:
@@ -433,6 +461,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
     # 命令mai score
     if result.find("score"):
+        message_occurred()
         m = await inf_mai_score_v1(str(event.user_id), result.query[str]("score.music_id"))
         if m.status:
             await mai_command.finish(MessageSegment.reply(event.message_id) + MessageSegment.image(m.get_image()))
@@ -442,6 +471,7 @@ async def  _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: A
 
 @what_song_cmd.handle()
 async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: Arparma):
+    message_occurred()
     keyword = result.header["keyword"]
     m = await inf_mai_what_song(keyword)
     if m.status:
@@ -456,6 +486,7 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: Ar
 
 @version_song_list_cmd.handle()
 async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: Arparma):
+    message_occurred()
     version = result.header["version"]
     m = await inf_mai_plate_song_list_v1(version)
     if m.status:
@@ -465,6 +496,7 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: Ar
 
 @level_and_plate_completion_cmd.handle()
 async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: Arparma):
+    message_occurred()
     keyword = result.header["keyword"]
     if check_level(keyword):
         await level_and_plate_completion_cmd.finish(MessageSegment.reply(event.message_id) + MessageSegment.text("🚧施工中~"))
@@ -477,6 +509,7 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: Ar
 
 @level_process_cmd.handle()
 async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: Arparma):
+    message_occurred()
     keyword = result.header["keyword"]
     if check_level(keyword):
         await level_process_cmd.finish(MessageSegment.reply(event.message_id) + MessageSegment.text("🚧施工中~"))

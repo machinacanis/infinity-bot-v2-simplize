@@ -1,3 +1,4 @@
+import asyncio
 import os
 import sys
 
@@ -13,7 +14,6 @@ from infinity.whitelist import update_whitelist_and_banned_list
 dotenv.load_dotenv()
 set_start_time()
 init_hourly_message_processed()
-update_whitelist_and_banned_list()
 
 # 加载数据库连接
 connection.create_connection()

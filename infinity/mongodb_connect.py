@@ -23,6 +23,8 @@ class MongoDBConnect:
     chunithm_alias_collection: AsyncIOMotorCollection[Mapping[str, Any]]
     maimai_arcade_collection: AsyncIOMotorCollection[Mapping[str, Any]]
     chunithm_arcade_collection: AsyncIOMotorCollection[Mapping[str, Any]]
+    group_whitelist_collection: AsyncIOMotorCollection[Mapping[str, Any]]
+    user_blacklist_collection: AsyncIOMotorCollection[Mapping[str, Any]]
 
     # 数据拉取缓存，这部分变量应该在处理之后被清空
     maimai_song_data: list[MaimaiSongData]
@@ -63,6 +65,8 @@ class MongoDBConnect:
         self.chunithm_alias_collection = self.client["infinity"]["chunithm_alias"]
         self.maimai_arcade_collection = self.client["infinity"]["maimai_arcade_list"]
         self.chunithm_arcade_collection = self.client["infinity"]["chunithm_arcade_list"]
+        self.group_whitelist_collection = self.client["infinity"]["group_whitelist"]
+        self.user_blacklist_collection = self.client["infinity"]["user_blacklist"]
 
 
 
@@ -805,5 +809,59 @@ class MongoDBConnect:
         result = [ArcadeInfo.from_dict(doc) for doc in documents]
         self.cache.set(cache_key, result)
         return result
+
+    async def add_group_to_whitelist(self, group_id: int | str):
+        """将群组加入白名单"""
+        try:
+            if isinstance(group_id, str):
+                group_id = int(group_id)
+            await self.group_whitelist_collection.insert_one({"group_id": group_id})
+        except Exception as e:
+            logger.error(f"添加群组到白名单时发生错误：{e}")
+
+    async def remove_group_from_whitelist(self, group_id: int | str):
+        """将群组移出白名单"""
+        try:
+            if isinstance(group_id, str):
+                group_id = int(group_id)
+            await self.group_whitelist_collection.delete_one({"group_id": group_id})
+        except Exception as e:
+            logger.error(f"从白名单中移出群组时发生错误：{e}")
+
+    async def get_whitelist(self):
+        """获取白名单列表"""
+        try:
+            res = await self.group_whitelist_collection.find({}).to_list()
+            return [doc["group_id"] for doc in res]
+        except Exception as e:
+            logger.error(f"获取白名单列表时发生错误：{e}")
+            return []
+
+    async def add_user_to_blacklist(self, user_id: int | str):
+        """将用户加入黑名单"""
+        try:
+            if isinstance(user_id, str):
+                user_id = int(user_id)
+            await self.user_blacklist_collection.insert_one({"user_id": user_id})
+        except Exception as e:
+            logger.error(f"添加用户到黑名单时发生错误：{e}")
+
+    async def remove_user_from_blacklist(self, user_id: int | str):
+        """将用户移出黑名单"""
+        try:
+            if isinstance(user_id, str):
+                user_id = int(user_id)
+            await self.user_blacklist_collection.delete_one({"user_id": user_id})
+        except Exception as e:
+            logger.error(f"从黑名单中移出用户时发生错误：{e}")
+
+    async def get_blacklist(self):
+        """获取黑名单列表"""
+        try:
+            res = await self.user_blacklist_collection.find({}).to_list()
+            return [doc["user_id"] for doc in res]
+        except Exception as e:
+            logger.error(f"获取黑名单列表时发生错误：{e}")
+            return []
 
 connection = MongoDBConnect()

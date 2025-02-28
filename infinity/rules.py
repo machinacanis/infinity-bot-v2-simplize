@@ -19,7 +19,7 @@ async def is_allowed(event: PrivateMessageEvent | GroupMessageEvent) -> bool:
 
 async def is_superuser(event: PrivateMessageEvent | GroupMessageEvent) -> bool:
     # 用于检测触发事件的用户是否具有超级用户权限
-    if event.user_id in infinity.superusers:
+    if str(event.user_id) in infinity.superusers:
         return True
     else:
         return False

@@ -33,3 +33,5 @@ class CacheManager:
         """异步版本，疑似存在问题，不建议使用"""
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, self.get, key)
+
+global_cache = CacheManager("global", 256)

@@ -1,6 +1,10 @@
 import re
 from datetime import timedelta
 
+from nonebot import Bot
+
+from infinity import global_cache
+
 
 def is_dx(mid: int):
     if 10000 <= mid < 100000:
@@ -195,3 +199,15 @@ def split_plate_name(plate_name: str):
     else:
         # 如果匹配失败，返回None
         return None
+
+async def get_instance_qid(bot: Bot):
+    # 从缓存中尝试获取QQ号
+    res = global_cache.get("instance_qid")
+    if res:
+        return res
+    instance = await bot.get_login_info()
+    qid = instance["user_id"]
+    nickname = instance["nickname"]
+    global_cache.set("instance_qid", qid)
+    global_cache.set("instace_nickname", nickname)
+    return qid
