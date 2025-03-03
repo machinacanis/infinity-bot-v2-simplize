@@ -1,5 +1,3 @@
-from typing import Any, Coroutine
-
 import httpx
 from httpx import Response
 
@@ -27,7 +25,9 @@ class DivingFishClient:
         if self.import_token:
             headers["Import-Token"] = self.import_token
         async with httpx.AsyncClient() as c:
-            resp = await c.post(self.uri + data_type + endpoint, headers=headers, json=data)
+            resp = await c.post(
+                self.uri + data_type + endpoint, headers=headers, json=data
+            )
             return resp
 
     async def get_agreement(self) -> bool:
@@ -37,7 +37,9 @@ class DivingFishClient:
                 self.is_agree = True
         return self.is_agree
 
-    async def query_user_plate(self, qq: int | str = "", username: str = "", version: str | list[str] = ""):
+    async def query_user_plate(
+        self, qq: int | str = "", username: str = "", version: str | list[str] = ""
+    ):
         # qq和username至少有一个，version可以为空，如果为空则查询全部版本
         if not qq and not username:
             return None
@@ -49,6 +51,7 @@ class DivingFishClient:
         if version:
             data["version"] = version if isinstance(version, list) else [version]
         resp = await self.post("maimaidxprober", "/player/plate", data)
+        return resp
 
 
 class LxnsClient:
@@ -72,4 +75,3 @@ class LxnsClient:
         async with httpx.AsyncClient() as c:
             resp = await c.post(self.uri + endpoint, headers=headers, json=data)
             return resp
-

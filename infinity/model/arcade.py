@@ -31,5 +31,5 @@ class ArcadeInfo:
             "province": self.province,
             "arcadeName": self.arcade_name,
             "mall": self.mall,
-            "address": self.address
+            "address": self.address,
         }

@@ -6,7 +6,9 @@ from PIL.ImageFile import ImageFile
 
 # code from github.com/machinacanis/kikaiken-bot
 
-infinity_system_message_prefix = ">>> 「Infinity Bot」 \n" # 暂时不需要这个消息内容，占个位置先
+infinity_system_message_prefix = (
+    ">>> 「Infinity Bot」 \n"  # 暂时不需要这个消息内容，占个位置先
+)
 infinity_global_exception = "发生了意料之外的异常。\n请稍后重试，或联系开发者。"
 infinity_result_not_found = "没有搜索到任何结果。"
 infinity_need_no_paging = "共找到 %d 条结果\n%s"
@@ -20,13 +22,18 @@ class InfinityUniMessage:
     """
     用于构造跨平台文本消息的存储类
     """
+
     def __init__(self):
         self._content = []  # 内容负载
         self._image = []  # 图片负载，一般只建议存入一张
-        self._is_system_message = False  # 是否为系统消息，决定是否显示系统消息抬头，默认为False
+        self._is_system_message = (
+            False  # 是否为系统消息，决定是否显示系统消息抬头，默认为False
+        )
         self.is_paged = False  # 消息是否需要分页，默认为False
         self._row_per_page = 15  # 每页显示的行数，默认为15
-        self._prefix = ""  # 消息抬头，默认为空，构建时显示在消息内容上方一行，系统信息抬头下方一行
+        self._prefix = (
+            ""  # 消息抬头，默认为空，构建时显示在消息内容上方一行，系统信息抬头下方一行
+        )
         self._suffix = ""  # 消息尾，默认为空，构建时显示在消息内容下方一行
         self._disable_content = False  # 取消内容显示，此时不会将content列表作为内容构建，一般用于保证仅显示异常信息
         self._exception = ""  # 异常信息内容
@@ -118,22 +125,34 @@ class InfinityUniMessage:
                     if self.get_content_length() == 0:
                         result += infinity_result_not_found
                     elif self.get_content_length() <= self._row_per_page:
-                        result += infinity_need_no_paging % (self.get_content_length(), "\n".join(self._content))
+                        result += infinity_need_no_paging % (
+                            self.get_content_length(),
+                            "\n".join(self._content),
+                        )
                     elif self.get_content_length() > self._row_per_page:
-                        result += infinity_need_paging % (self.get_content_length(), page_num,
-                                                          self.get_page_count(), "\n".join(self._content[
-                                                                                           self.get_page_start(
-                                                                                               page_num):self.get_page_start(
-                                                                                               page_num) + self._row_per_page]))
+                        result += infinity_need_paging % (
+                            self.get_content_length(),
+                            page_num,
+                            self.get_page_count(),
+                            "\n".join(
+                                self._content[
+                                    self.get_page_start(page_num) : self.get_page_start(
+                                        page_num
+                                    )
+                                    + self._row_per_page
+                                ]
+                            ),
+                        )
             else:
                 for content in self._content:
                     result += content + "\n"
                 # 最后一行不需要换行符，去除结尾的换行符
                 result = result[:-1]
 
-
         if self._exception != "":
-            result += "\n" + "异常：" + self._exception + "\n" + infinity_global_exception
+            result += (
+                "\n" + "异常：" + self._exception + "\n" + infinity_global_exception
+            )
 
         if self._suffix != "":
             result += "\n" + self._suffix
@@ -143,12 +162,12 @@ class InfinityUniMessage:
     def get_image(self, index: int = 0):
         if isinstance(self._image[index], ImageFile):
             byte_io = io.BytesIO()
-            self._image[index].save(byte_io, format='PNG')
+            self._image[index].save(byte_io, format="PNG")
             byte_io.seek(0)
             return byte_io
         if isinstance(self._image[index], Image):
             byte_io = io.BytesIO()
-            self._image[index].save(byte_io, format='PNG')
+            self._image[index].save(byte_io, format="PNG")
             byte_io.seek(0)
             return byte_io
         return self._image[index]

@@ -137,13 +137,21 @@ def chunithm_ra_calculate(ds: float, achievement: int):
     if achievement <= 500000:
         calculated_rating = 0
     elif achievement < 800000:
-        calculated_rating = max(0, linear_interpolate(500000, 800000, ds - 5, 0, achievement))
+        calculated_rating = max(
+            0, linear_interpolate(500000, 800000, ds - 5, 0, achievement)
+        )
     elif achievement < 900000:
-        calculated_rating = max(0, linear_interpolate(800000, 900000, ds - 5, ds - 5, achievement))
+        calculated_rating = max(
+            0, linear_interpolate(800000, 900000, ds - 5, ds - 5, achievement)
+        )
     elif achievement < 925000:
-        calculated_rating = max(0, linear_interpolate(900000, 925000, ds - 5, ds - 3, achievement))
+        calculated_rating = max(
+            0, linear_interpolate(900000, 925000, ds - 5, ds - 3, achievement)
+        )
     elif achievement < 975000:
-        calculated_rating = max(0, linear_interpolate(925000, 975000, ds - 3, ds, achievement))
+        calculated_rating = max(
+            0, linear_interpolate(925000, 975000, ds - 3, ds, achievement)
+        )
     elif achievement < 1000000:
         calculated_rating = ds + (achievement - 975000) // 250 * 0.01
     elif achievement < 1005000:
@@ -169,12 +177,13 @@ def deduplicate(query_result):
     unique_results = []
 
     for document in query_result:
-        object_id = document.get('_id')
+        object_id = document.get("_id")
         if object_id and object_id not in seen:
             seen.add(object_id)
             unique_results.append(document)
 
     return unique_results
+
 
 def format_timedelta(td: timedelta) -> str:
     days = td.days
@@ -182,15 +191,40 @@ def format_timedelta(td: timedelta) -> str:
     minutes, _ = divmod(remainder, 60)
     return f"{days} 天 {hours} 小时 {minutes} 分钟"
 
+
 def check_level(level: str):
-    if level in ["1", "2", "3", "4", "5", "6", "7", "7+", "8", "8+", "9", "9+", "10", "10+", "11", "11+", "12", "12+", "13", "13+", "14", "14+", "15"]:
+    if level in [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "7+",
+        "8",
+        "8+",
+        "9",
+        "9+",
+        "10",
+        "10+",
+        "11",
+        "11+",
+        "12",
+        "12+",
+        "13",
+        "13+",
+        "14",
+        "14+",
+        "15",
+    ]:
         return True
     return False
 
 
 def split_plate_name(plate_name: str):
     # 定义正则表达式，匹配以“将”、“极”、“神”或“舞舞”结尾的名词
-    pattern = r'^(.*?)(将|极|神|舞舞)$'
+    pattern = r"^(.*?)(将|极|神|舞舞)$"
     match = re.match(pattern, plate_name)
 
     if match:
@@ -199,6 +233,7 @@ def split_plate_name(plate_name: str):
     else:
         # 如果匹配失败，返回None
         return None
+
 
 async def get_instance_qid(bot: Bot):
     # 从缓存中尝试获取QQ号

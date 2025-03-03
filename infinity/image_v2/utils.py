@@ -11,6 +11,7 @@ ntlgpro_B_18 = ImageFont.truetype("./assets/font/FOT-RodinNTLGPro-B.otf", 18)
 sans_35_font_28 = ImageFont.truetype("./assets/font/SourceHanSans_35.otf", 28)
 ntlgpro_EB_48 = ImageFont.truetype("./assets/font/FOT-RodinNTLGPro-EB.otf", 48)
 
+
 def generate_maimai_filename(song_id: int):
     # 将ID转换为字符串，并在左侧补足0，使其总长度为6位
     padded_id = f"{song_id:06}"
@@ -27,7 +28,9 @@ def generate_chunithm_filename(song_id: int):
     return filename
 
 
-def draw_centered_text(draw: ImageDraw, text: str, position: tuple, font: ImageFont, fill: str):
+def draw_centered_text(
+    draw: ImageDraw, text: str, position: tuple, font: ImageFont, fill: str
+):
     # 计算文本的边界框
     bbox = draw.textbbox((0, 0), text, font=font)
     text_width = bbox[2] - bbox[0]
@@ -40,7 +43,14 @@ def draw_centered_text(draw: ImageDraw, text: str, position: tuple, font: ImageF
     draw.text((x, y), text, font=font, fill=fill)
 
 
-def draw_wrapped_text(draw: ImageDraw, text: str, position: tuple, font: ImageFont, fill: str, max_width: int):
+def draw_wrapped_text(
+    draw: ImageDraw,
+    text: str,
+    position: tuple,
+    font: ImageFont,
+    fill: str,
+    max_width: int,
+):
     # 拆分文本为单词列表
     words = text.split()
     lines = []

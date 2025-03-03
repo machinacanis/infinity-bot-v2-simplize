@@ -19,7 +19,8 @@ versions = [
     {"id": 13, "title": "NEW PLUS", "version": 20500},
     {"id": 14, "title": "SUN", "version": 21000},
     {"id": 15, "title": "SUN PLUS", "version": 21500},
-    {"id": 16, "title": "LUMINOUS", "version": 22000}
+    {"id": 16, "title": "LUMINOUS", "version": 22000},
+    {"id": 17, "title": "LUMINOUS PLUS", "version": 22500},
 ]
 
 version_dict = {version["version"]: version["title"] for version in versions}
@@ -39,7 +40,7 @@ class Notes:
     slides: int
     airs: int
     flicks: int
-    
+
     def to_dict(self):
         return {
             "total": self.total,
@@ -47,18 +48,18 @@ class Notes:
             "hold": self.holds,
             "slide": self.slides,
             "air": self.airs,
-            "flick": self.flicks
+            "flick": self.flicks,
         }
-    
+
     @staticmethod
-    def from_dict(data: dict) -> 'Notes':
+    def from_dict(data: dict) -> "Notes":
         return Notes(
-            total=data.get('total', 0),
-            taps=data.get('tap', 0),
-            holds=data.get('hold', 0),
-            slides=data.get('slide', 0),
-            airs=data.get('air', 0),
-            flicks=data.get('flick', 0)
+            total=data.get("total", 0),
+            taps=data.get("tap", 0),
+            holds=data.get("hold", 0),
+            slides=data.get("slide", 0),
+            airs=data.get("air", 0),
+            flicks=data.get("flick", 0),
         )
 
 
@@ -74,7 +75,7 @@ class ChuniChartData:
     kanji: str
     star: int
     notes: Notes
-    
+
     def to_dict(self):
         return {
             "difficulty": self.difficulty,
@@ -85,21 +86,21 @@ class ChuniChartData:
             "origin_id": self.origin_id,
             "kanji": self.kanji,
             "star": self.star,
-            "notes": self.notes.to_dict()
+            "notes": self.notes.to_dict(),
         }
-    
+
     @staticmethod
-    def from_dict(data: dict) -> 'ChuniChartData':
+    def from_dict(data: dict) -> "ChuniChartData":
         return ChuniChartData(
-            difficulty=data.get('difficulty', 0),
-            level=data.get('level', ''),
-            level_value=data.get('level_value', 0),
-            note_designer=data.get('note_designer', ''),
-            version=data.get('version', 0),
-            origin_id=data.get('origin_id', 0),
-            kanji=data.get('kanji', ''),
-            star=data.get('star', 0),
-            notes=Notes.from_dict(data.get('notes', {}))
+            difficulty=data.get("difficulty", 0),
+            level=data.get("level", ""),
+            level_value=data.get("level_value", 0),
+            note_designer=data.get("note_designer", ""),
+            version=data.get("version", 0),
+            origin_id=data.get("origin_id", 0),
+            kanji=data.get("kanji", ""),
+            star=data.get("star", 0),
+            notes=Notes.from_dict(data.get("notes", {})),
         )
 
 
@@ -116,7 +117,7 @@ class ChuniWorldEndChartData:
     star: int
     notes: Notes
     worldend_specific_field: str  # 特殊字段
-    
+
     def to_dict(self):
         return {
             "difficulty": self.difficulty,
@@ -128,22 +129,22 @@ class ChuniWorldEndChartData:
             "kanji": self.kanji,
             "star": self.star,
             "notes": self.notes.to_dict(),
-            "worldend_specific_field": self.worldend_specific_field
+            "worldend_specific_field": self.worldend_specific_field,
         }
-    
+
     @staticmethod
-    def from_dict(data: dict) -> 'ChuniWorldEndChartData':
+    def from_dict(data: dict) -> "ChuniWorldEndChartData":
         return ChuniWorldEndChartData(
-            difficulty=data.get('difficulty', 0),
-            level=data.get('level', ''),
-            level_value=data.get('level_value', 0),
-            note_designer=data.get('note_designer', ''),
-            version=data.get('version', 0),
-            origin_id=data.get('origin_id', 0),
-            kanji=data.get('kanji', ''),
-            star=data.get('star', 0),
-            notes=Notes.from_dict(data.get('notes', {})),
-            worldend_specific_field=data.get('worldend_specific_field', '')
+            difficulty=data.get("difficulty", 0),
+            level=data.get("level", ""),
+            level_value=data.get("level_value", 0),
+            note_designer=data.get("note_designer", ""),
+            version=data.get("version", 0),
+            origin_id=data.get("origin_id", 0),
+            kanji=data.get("kanji", ""),
+            star=data.get("star", 0),
+            notes=Notes.from_dict(data.get("notes", {})),
+            worldend_specific_field=data.get("worldend_specific_field", ""),
         )
 
 
@@ -158,8 +159,10 @@ class ChuniSongData:
     version: int
     version_name: str
     rights: str
-    charts: List[Union[ChuniChartData, ChuniWorldEndChartData]]  # 允许普通和特殊谱面共存
-    
+    charts: List[
+        Union[ChuniChartData, ChuniWorldEndChartData]
+    ]  # 允许普通和特殊谱面共存
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -172,81 +175,82 @@ class ChuniSongData:
             "rights": self.rights,
             "charts": [chart.to_dict() for chart in self.charts],
         }
-    
+
     @staticmethod
-    def from_dict(data: dict) -> 'ChuniSongData':
+    def from_dict(data: dict) -> "ChuniSongData":
         charts = []
-        for chart in data.get('charts', []):
-            if chart.get('worldend_specific_field'):  # 判断是否是WORLDEND类型
+        for chart in data.get("charts", []):
+            if chart.get("worldend_specific_field"):  # 判断是否是WORLDEND类型
                 charts.append(ChuniWorldEndChartData.from_dict(chart))
             else:
                 charts.append(ChuniChartData.from_dict(chart))
         return ChuniSongData(
-            id=data.get('id', 0),
-            title=data.get('title', ''),
-            artist=data.get('artist', ''),
-            genre=data.get('genre', ''),
-            bpm=data.get('bpm', 0),
-            version=data.get('version', 0),
-            version_name=return_ver_name(data.get('version', 0)),
-            rights=data.get('rights', ''),
+            id=data.get("id", 0),
+            title=data.get("title", ""),
+            artist=data.get("artist", ""),
+            genre=data.get("genre", ""),
+            bpm=data.get("bpm", 0),
+            version=data.get("version", 0),
+            version_name=return_ver_name(data.get("version", 0)),
+            rights=data.get("rights", ""),
             charts=charts,
         )
 
 
 # 创建谱面数据的函数，区分普通谱面和WORLDEND谱面
 def create_chuni_chart_data(data):
-    if data.get('worldend_specific_field'):  # 如果是WORLDEND类型
+    if data.get("worldend_specific_field"):  # 如果是WORLDEND类型
         return ChuniWorldEndChartData(
-            difficulty=int(data.get('difficulty', 0)),
-            level=data.get('level', ''),
-            level_value=data.get('level_value', 0.0),
-            note_designer=data.get('note_designer', ''),
-            version=data.get('version', 0),
-            origin_id=data.get('origin_id', 0),
-            kanji=data.get('kanji', ''),
-            star=data.get('star', 0),
-            notes=Notes.from_dict(data.get('notes', {})),
-            worldend_specific_field=data.get('worldend_specific_field', '')
+            difficulty=int(data.get("difficulty", 0)),
+            level=data.get("level", ""),
+            level_value=data.get("level_value", 0.0),
+            note_designer=data.get("note_designer", ""),
+            version=data.get("version", 0),
+            origin_id=data.get("origin_id", 0),
+            kanji=data.get("kanji", ""),
+            star=data.get("star", 0),
+            notes=Notes.from_dict(data.get("notes", {})),
+            worldend_specific_field=data.get("worldend_specific_field", ""),
         )
     else:  # 常规谱面
         return ChuniChartData(
-            difficulty=int(data.get('difficulty', 0)),
-            level=data.get('level', ''),
-            level_value=data.get('level_value', 0.0),
-            note_designer=data.get('note_designer', ''),
-            version=data.get('version', 0),
-            origin_id=data.get('origin_id', 0),
-            kanji=data.get('kanji', ''),
-            star=data.get('star', 0),
-            notes=Notes.from_dict(data.get('notes', {}))
+            difficulty=int(data.get("difficulty", 0)),
+            level=data.get("level", ""),
+            level_value=data.get("level_value", 0.0),
+            note_designer=data.get("note_designer", ""),
+            version=data.get("version", 0),
+            origin_id=data.get("origin_id", 0),
+            kanji=data.get("kanji", ""),
+            star=data.get("star", 0),
+            notes=Notes.from_dict(data.get("notes", {})),
         )
 
 
 # 创建歌曲数据的函数
 def create_chuni_song_data(json_data: list[dict]) -> list[ChuniSongData]:
     songs = []
-    
+
     for song in json_data:
         charts = []
-        
-        for chart in song.get('difficulties', []):
+
+        for chart in song.get("difficulties", []):
             charts.append(create_chuni_chart_data(chart))
-        
+
         song_data = ChuniSongData(
-            id=song.get('id', 0),
-            title=song.get('title', ''),
-            artist=song.get('artist', ''),
-            genre=song.get('genre', ''),
-            bpm=song.get('bpm', 0),
-            version=song.get('version', 0),
-            version_name=return_ver_name(song.get('version', 0)),
-            rights=song.get('rights', ''),
+            id=song.get("id", 0),
+            title=song.get("title", ""),
+            artist=song.get("artist", ""),
+            genre=song.get("genre", ""),
+            bpm=song.get("bpm", 0),
+            version=song.get("version", 0),
+            version_name=return_ver_name(song.get("version", 0)),
+            rights=song.get("rights", ""),
             charts=charts,
         )
         songs.append(song_data)
-    
+
     return songs
+
 
 class ChuniDifficulty:
     difficult: int = -1

@@ -18,7 +18,7 @@ async def db_refresh():
             gm.get_maimai_aliases_from_fanyu(),
             gm.get_chunithm_aliases_from_lx(),
             gm.get_maimai_arcade_data_from_wahlap(),
-            gm.get_chunithm_arcade_data_from_wahlap()
+            gm.get_chunithm_arcade_data_from_wahlap(),
         )
         logger.info("全量更新数据拉取完成")
         await asyncio.gather(
@@ -27,10 +27,11 @@ async def db_refresh():
             gm.update_maimai_alias_data(),
             gm.update_chunithm_alias_data(),
             gm.update_maimai_arcade_data(),
-            gm.update_chunithm_arcade_data()
+            gm.update_chunithm_arcade_data(),
         )
 
     await update()
+
 
 async def main():
     img = await inf_mai_b50_v1("2913844577")
@@ -39,4 +40,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

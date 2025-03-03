@@ -1,15 +1,16 @@
 import aiohttp
-import httpx
 
 import infinity
 
 
 class DivingFishClient:
-    BASE_URL = 'https://www.diving-fish.com/api'
+    BASE_URL = "https://www.diving-fish.com/api"
     post = "POST"
     get = "GET"
 
-    async def request_json(self, method: str, endpoint: str, params: dict = None, json: dict = None):
+    async def request_json(
+        self, method: str, endpoint: str, params: dict = None, json: dict = None
+    ):
         """
         发送异步 HTTP 请求，并自动管理会话。
 
@@ -19,11 +20,15 @@ class DivingFishClient:
         :param json: 请求体 (适用于 POST 请求)
         :return: 返回 HTTP 响应
         """
-        url = f'{self.BASE_URL}{endpoint}'
+        url = f"{self.BASE_URL}{endpoint}"
 
         # 使用上下文管理器来自动关闭会话
-        async with aiohttp.ClientSession(headers={"developer-token": infinity.df_token}) as session:
-            async with session.request(method, url, params=params, json=json) as response:
+        async with aiohttp.ClientSession(
+            headers={"developer-token": infinity.df_token}
+        ) as session:
+            async with session.request(
+                method, url, params=params, json=json
+            ) as response:
                 return await response.json()
 
     def get_request_payload(self, qq: str = None, username: str = None):
@@ -36,17 +41,21 @@ class DivingFishClient:
                 payload = {"username": username}
             return payload
 
-    async def maimaidxprober_query_plate(self, version_list: list, qq: int = None, username: str = None):
+    async def maimaidxprober_query_plate(
+        self, version_list: list, qq: int = None, username: str = None
+    ):
         payload = self.get_request_payload(qq=qq, username=username)
-        payload['version'] = version_list
-        endpoint = '/maimaidxprober/query/plate'
+        payload["version"] = version_list
+        endpoint = "/maimaidxprober/query/plate"
         resp_json = await self.request_json(self.post, endpoint, json=payload)
         return resp_json
 
-    async def maimaidxprober_dev_player_record(self, music_list: list, qq: int = None, username: str = None):
+    async def maimaidxprober_dev_player_record(
+        self, music_list: list, qq: int = None, username: str = None
+    ):
         payload = self.get_request_payload(qq=qq, username=username)
-        payload['music_id'] = music_list
-        endpoint = '/maimaidxprober/dev/player/record'
+        payload["music_id"] = music_list
+        endpoint = "/maimaidxprober/dev/player/record"
         resp_json = await self.request_json(self.post, endpoint, json=payload)
         return resp_json
 

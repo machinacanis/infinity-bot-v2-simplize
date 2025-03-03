@@ -1,4 +1,3 @@
-import asyncio
 import os
 import threading
 import time
@@ -25,9 +24,12 @@ def get_message_count_last_hour():
     one_hour_ago = datetime.now() - timedelta(hours=1)
     # 处理掉一个小时前的消息时间戳防止内存泄漏
     global message_timestamps
-    message_timestamps = [timestamp for timestamp in message_timestamps if timestamp > one_hour_ago]
+    message_timestamps = [
+        timestamp for timestamp in message_timestamps if timestamp > one_hour_ago
+    ]
     # 返回一个小时内的消息数量
     return len(message_timestamps)
+
 
 def init_hourly_message_processed():
     # 这个函数需要在机器人启动时初始化！！！
@@ -43,6 +45,7 @@ def init_hourly_message_processed():
     thread.daemon = True
     thread.start()
 
+
 def get_hourly_message_processed():
     # 计算每小时平均处理消息数
     if len(hourly_message_processed) == 0:
@@ -56,7 +59,7 @@ async def get_qq_groups_joined_count(bot: OnebotV11Bot) -> int:
     """
     try:
         group_list = await bot.get_group_list()
-    except nonebot.adapters.onebot.v11.exception.ActionFailed as e:
+    except nonebot.adapters.onebot.v11.exception.ActionFailed:
         return 0
     return len(group_list)
 
@@ -73,7 +76,13 @@ def get_memory_usage() -> tuple[Any, Any, Any, Any, Any]:
     memory_total = round(psutil.virtual_memory().total / 1024 / 1024, 1)
     memory_used_by_bot_precent = round(memory_used_by_bot / memory_total * 100, 1)
     memory_used_all_precent = round(memory_used_all / memory_total * 100, 1)
-    return memory_used_by_bot, memory_used_all, memory_total, memory_used_by_bot_precent, memory_used_all_precent
+    return (
+        memory_used_by_bot,
+        memory_used_all,
+        memory_total,
+        memory_used_by_bot_precent,
+        memory_used_all_precent,
+    )
 
 
 def set_start_time():
@@ -87,6 +96,7 @@ def get_running_time() -> timedelta:
     """
     return datetime.now() - start_timestamp
 
+
 async def check_diving_fish() -> bool:
     resp = httpx.get(infinity.df_api + "maimaidxprober/alive_check")
     if resp.status_code != 200:
@@ -95,17 +105,20 @@ async def check_diving_fish() -> bool:
         return False
     return True
 
+
 async def check_lxns() -> bool:
     resp = httpx.get(infinity.lx_api + "maimai/song/list")
     if resp.status_code != 200:
         return False
     return True
 
+
 async def check_fanyu() -> bool:
     resp = httpx.get(infinity.fanyu_api + "maimai/alias.json")
     if resp.status_code != 200:
         return False
     return True
+
 
 async def check_wahlap() -> bool:
     resp = httpx.get(infinity.wahlap_arcade_api + "maidx/rest/location")

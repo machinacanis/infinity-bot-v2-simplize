@@ -1,4 +1,3 @@
-import asyncio
 import os
 import sys
 
@@ -7,8 +6,14 @@ import nonebot
 from nonebot import logger
 from nonebot.adapters.onebot import V11Adapter  # 避免重复命名
 
-from infinity import set_start_time, init_hourly_message_processed, connection
-from infinity.whitelist import update_whitelist_and_banned_list
+from infinity import (
+    set_start_time,
+    init_hourly_message_processed,
+    connection,
+    mongo_url,
+    mongo_user,
+    mongo_password,
+)
 
 # 初始化
 dotenv.load_dotenv()
@@ -16,7 +21,7 @@ set_start_time()
 init_hourly_message_processed()
 
 # 加载数据库连接
-connection.create_connection()
+connection.create_connection(mongo_url, mongo_user, mongo_password)
 
 logger.remove()
 logger.level("DEBUG", color="<blue>", icon="[__DEBUG]")
@@ -25,7 +30,7 @@ logger.level("SUCCESS", color="<green>", icon="[SUCCESS]")
 logger.level("WARNING", color="<yellow>", icon="[WARNING]")
 logger.level("ERROR", color="<red>", icon="[__ERROR]")
 default_format: str = (
-    "<cyan>{time:MM/DD HH:mm:ss}</cyan> " "<lvl>{level.icon}</lvl> " "{message}"
+    "<cyan>{time:MM/DD HH:mm:ss}</cyan> <lvl>{level.icon}</lvl> {message}"
 )
 infinity_logger_id = logger.add(
     sys.stdout,
