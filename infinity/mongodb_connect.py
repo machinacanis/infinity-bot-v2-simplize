@@ -27,6 +27,7 @@ class MongoDBConnect:
     chunithm_arcade_collection: AsyncIOMotorCollection[Mapping[str, Any]]
     group_whitelist_collection: AsyncIOMotorCollection[Mapping[str, Any]]
     user_blacklist_collection: AsyncIOMotorCollection[Mapping[str, Any]]
+    chunithm_sdvxin_mapping_collection: AsyncIOMotorCollection[Mapping[str, Any]]
 
     # 数据拉取缓存，这部分变量应该在处理之后被清空
     maimai_song_data: list[MaimaiSongData]
@@ -71,6 +72,7 @@ class MongoDBConnect:
         ]
         self.group_whitelist_collection = self.client["infinity"]["group_whitelist"]
         self.user_blacklist_collection = self.client["infinity"]["user_blacklist"]
+        self.chunithm_sdvxin_mapping_collection = self.client["infinity"]["sdvxin_mapping"]
 
     def close_connection(self):
         """关闭数据库连接的方法"""

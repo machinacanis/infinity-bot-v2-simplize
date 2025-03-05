@@ -23,6 +23,7 @@ from infinity import (
     ChuniDifficulty,
     chunithm_ra_calculate,
 )
+from infinity.chunithm_previewer_v1 import get_chunithm_preview_v1
 from infinity.image_v2 import (
     maimai_song_card_img,
     generate_maimai_filename,
@@ -1388,4 +1389,26 @@ async def inf_chu_ra_calculating(decimal: float, acc: float):
     ra = chunithm_ra_calculate(decimal, acc)
     msg.add_content(f"定数 {decimal:.1f}")
     msg.add_content(f"在 {acc:.4f}% 的得分是 {ra[1]} 。")
+    return msg
+
+async def inf_chu_chart_preview(music_id: int, difficulty: str):
+    print(difficulty)
+    msg = create_infinity_message()
+    is_difficulty = False
+    if difficulty:
+        is_difficulty = True
+    if is_difficulty:
+        difficulty = ChuniDifficulty(difficulty)
+        if difficulty.int() == -1:
+            msg.add_content("提供的信息不对哦！")
+            return msg
+    else:
+        difficulty = ChuniDifficulty(3)
+    img = await get_chunithm_preview_v1(music_id, difficulty)
+    if img:
+        msg.success()
+        msg.add_image(img)
+        msg.add_content("谱面预览数据来自 sdvx.in")
+    else:
+        msg.add_content("您指定的谱面没有谱面预览。")
     return msg

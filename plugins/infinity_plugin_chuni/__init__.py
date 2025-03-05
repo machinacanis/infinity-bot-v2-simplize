@@ -28,7 +28,7 @@ from infinity.infinity_api_v1 import (
     inf_chu_roll,
     inf_chu_roll_by_decimal,
     inf_chu_roll_by_level,
-    inf_chu_ra_calculating,
+    inf_chu_ra_calculating, inf_chu_chart_preview,
 )
 from infinity.rules import is_allowed
 
@@ -87,6 +87,7 @@ chu_command = on_alconna(
         Subcommand("等级随歌", Args["level", str]["difficulty?", str]),
         Subcommand("定数表", Args["level", str]),
         Subcommand("ra计算", Args["decimal", float]["acc", float]),
+        Subcommand("谱面预览", Args["music_id", int]["difficulty?", str]),
     ),
     use_cmd_start=True,
     use_cmd_sep=True,
@@ -383,3 +384,22 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: Ar
         await chu_command.finish(
             MessageSegment.reply(event.message_id) + MessageSegment.text(m.build())
         )
+
+    # 命令chu 谱面预览
+    if result.find("谱面预览"):
+        message_occurred()
+        m = await inf_chu_chart_preview(
+            result.query[int]("谱面预览.music_id"),
+            result.query[str]("谱面预览.difficulty"),
+        )
+        if m.status:
+            await chu_command.finish(
+                MessageSegment.reply(event.message_id)
+                + MessageSegment.text(m.build())
+                + MessageSegment.image(m.get_image())
+            )
+        else:
+            await chu_command.finish(
+                MessageSegment.reply(event.message_id) + MessageSegment.text(m.build())
+            )
+
