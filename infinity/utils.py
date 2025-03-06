@@ -217,6 +217,7 @@ def check_level(level: str):
         "14",
         "14+",
         "15",
+        "15+",
     ]:
         return True
     return False

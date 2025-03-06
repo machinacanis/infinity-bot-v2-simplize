@@ -1,6 +1,7 @@
-import json, os, base64
+import json
+import os
+
 from PIL import Image, ImageFont, ImageDraw
-from io import BytesIO
 
 from .divingFishApi import divingFishApi
 
@@ -146,9 +147,4 @@ async def chu_score_list(level: str, qq: str = None, username: str = None, page:
         dif_label = item["level_index"]
         bg.alpha_composite(Image.open(os.path.join(f"./assets/img/chu/socre_line/{dif_label}.png")).convert('RGBA').resize((24, 24)),
                            (515, 279 + 50 * i))
-
-    n_bg = bg.convert("RGB")
-    buffer = BytesIO()
-    n_bg.save(buffer, format = "JPEG")
-    byte_data = buffer.getvalue()
-    return base64.b64encode(byte_data).decode()
+    return bg

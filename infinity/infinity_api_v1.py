@@ -2,6 +2,7 @@ import json
 
 import PIL.Image
 import httpx
+from nonebot.adapters.onebot.v11 import Bot as OnebotV11Bot
 
 from infinity import (
     get_qq_groups_joined_count,
@@ -23,6 +24,8 @@ from infinity import (
     ChuniDifficulty,
     chunithm_ra_calculate,
 )
+from infinity.chunithm_lib_v1.chunithm_best_30 import generate_by_df
+from infinity.chunithm_lib_v1.chunithm_score_list import chu_score_list
 from infinity.chunithm_previewer_v1 import get_chunithm_preview_v1
 from infinity.image_v2 import (
     maimai_song_card_img,
@@ -41,8 +44,6 @@ from infinity.maimai_lib_v1.score_line import score_line
 from infinity.maimai_lib_v1.tool import translate_df_to_lx, filter_all_perfect_records
 from infinity.model.maimai_version import MaiVersion
 from infinity.model.uni_message import create_infinity_message, InfinityUniMessage
-from nonebot.adapters.onebot.v11 import Bot as OnebotV11Bot
-
 from infinity.userdata_client_v2 import LxnsClient
 from infinity.whitelist import (
     add_whitelist_qq_group,
@@ -96,7 +97,7 @@ async def inf_add_whitelist_qq_group(group_id: int):
     将指定QQ群加入白名单
     """
     msg = create_infinity_message()
-    add_whitelist_qq_group(group_id)
+    await add_whitelist_qq_group(group_id)
     msg.add_content(f"群 {group_id} 开启成功。")
     return msg
 
@@ -106,7 +107,7 @@ async def inf_remove_whitelist_qq_group(group_id: int):
     将指定QQ群移出白名单
     """
     msg = create_infinity_message()
-    remove_whitelist_qq_group(group_id)
+    await remove_whitelist_qq_group(group_id)
     msg.add_content(f"群 {group_id} 关闭成功。")
     return msg
 
@@ -116,7 +117,7 @@ async def inf_ban_qq_user(user_id: int):
     拉黑指定QQ用户
     """
     msg = create_infinity_message()
-    add_banned_qq_user(user_id)
+    await add_banned_qq_user(user_id)
     msg.add_content(f"用户 {user_id} 拉黑成功。")
     return msg
 
@@ -126,7 +127,7 @@ async def inf_unban_qq_user(user_id: int):
     解黑指定QQ用户
     """
     msg = create_infinity_message()
-    add_banned_qq_user(user_id)
+    await add_banned_qq_user(user_id)
     msg.add_content(f"用户 {user_id} 解黑成功。")
     return msg
 
@@ -1391,6 +1392,7 @@ async def inf_chu_ra_calculating(decimal: float, acc: float):
     msg.add_content(f"在 {acc:.4f}% 的得分是 {ra[1]} 。")
     return msg
 
+
 async def inf_chu_chart_preview(music_id: int, difficulty: str):
     print(difficulty)
     msg = create_infinity_message()
@@ -1412,3 +1414,38 @@ async def inf_chu_chart_preview(music_id: int, difficulty: str):
     else:
         msg.add_content("您指定的谱面没有谱面预览。")
     return msg
+
+async def inf_chu_find_arcade(keyword: str):
+    msg = create_infinity_message()
+    arcade = await connection.query_chunithm_arcade_by_keyword(keyword)
+    pass
+
+async def inf_chu_b30_v1(username: str = "", qq: str = "", is_lxns: bool = False, friend_code: str = ""):
+    msg = create_infinity_message()
+    if is_lxns:
+        msg.add_content("暂时不支持从落雪咖啡屋获取B30数据！")
+        return msg
+    else:
+        if username:
+            img, success = await generate_by_df({"username": username})
+        else:
+            user_id = qq
+            img, success = await generate_by_df({"qq": user_id})
+        if int(success) == 400:
+            msg.add_content("您还未绑定水鱼，请先绑定后再获取。")
+            return msg
+        msg.addimage(img)
+        return msg
+
+async def inf_chu_level_score_list_v1(qq: str = "", level: str = "", page: int = 1):
+    msg = create_infinity_message()
+    if not check_level(level):
+        msg.add_content("提供的信息不对哦！")
+        return msg
+    data = await chu_score_list(qq=qq, level=level, page=page)
+    if not data:
+        msg.add_content("您在当前难度下没有成绩。")
+        return msg
+    msg.add_image(data)
+    return msg
+

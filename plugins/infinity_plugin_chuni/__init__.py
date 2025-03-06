@@ -1,15 +1,11 @@
 from arclet.alconna import Arparma, Option
-from nonebot import on_notice, get_driver
 from nonebot.adapters.onebot.v11 import (
-    GroupBanNoticeEvent,
-    GroupDecreaseNoticeEvent,
     GroupMessageEvent,
     PrivateMessageEvent,
     Bot,
     MessageSegment,
 )
-from nonebot.rule import is_type
-from nonebot_plugin_alconna import on_alconna, Match, Alconna, Args, Subcommand
+from nonebot_plugin_alconna import on_alconna, Alconna, Args, Subcommand
 
 from infinity import message_occurred
 from infinity.infinity_api_v1 import (
@@ -28,7 +24,10 @@ from infinity.infinity_api_v1 import (
     inf_chu_roll,
     inf_chu_roll_by_decimal,
     inf_chu_roll_by_level,
-    inf_chu_ra_calculating, inf_chu_chart_preview,
+    inf_chu_ra_calculating,
+    inf_chu_chart_preview,
+    inf_chu_b30_v1,
+    inf_chu_level_score_list_v1,
 )
 from infinity.rules import is_allowed
 
@@ -88,6 +87,18 @@ chu_command = on_alconna(
         Subcommand("定数表", Args["level", str]),
         Subcommand("ra计算", Args["decimal", float]["acc", float]),
         Subcommand("谱面预览", Args["music_id", int]["difficulty?", str]),
+        Subcommand(
+            "b50",
+            Args["username?", str],
+            Option("--lxns|-lx|-lxns", Args["friend_code", str]),
+        ),
+        Subcommand("等级进度", Args["level", str]["flag", str]),
+        Subcommand(
+            "分数列表",
+            Args["level", str],
+            Option("-p|--page", Args["page", int], default=1),
+        ),
+        Subcommand("score", Args["music_id", str]),
     ),
     use_cmd_start=True,
     use_cmd_sep=True,
@@ -402,4 +413,56 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent, result: Ar
             await chu_command.finish(
                 MessageSegment.reply(event.message_id) + MessageSegment.text(m.build())
             )
+
+    # 命令chu b30
+    if result.find("b30"):
+        message_occurred()
+        username = result.query[str]("b30.username")
+        friend_code = result.query[str]("b30.friend_code")
+        is_lxns = True if result.find("b30.lxns") else False
+        if username:
+            m = await inf_chu_b30_v1(username, "")
+        else:
+            m = await inf_chu_b30_v1("", str(event.user_id))
+        if is_lxns:
+            m = await inf_chu_b30_v1("", "", is_lxns, friend_code)
+        if m.status:
+            await chu_command.finish(
+                MessageSegment.reply(event.message_id)
+                + MessageSegment.image(m.get_image())
+            )
+        else:
+            await chu_command.finish(
+                MessageSegment.reply(event.message_id) + MessageSegment.text(m.build())
+            )
+
+    # 命令chu 等级进度
+    if result.find("等级进度"):
+        message_occurred()
+        await chu_command.finish(
+            MessageSegment.reply(event.message_id) + MessageSegment.text("🚧施工中~")
+        )
+
+    # 命令chu 分数列表
+    if result.find("分数列表"):
+        message_occurred()
+        page = result.query[int]("分数列表.page.page")
+        m = await inf_chu_level_score_list_v1(
+            str(event.user_id), result.query[str]("分数列表.level"), page
+        )
+        if m.status:
+            await chu_command.finish(
+                MessageSegment.reply(event.message_id)
+                + MessageSegment.image(m.get_image())
+            )
+        else:
+            await chu_command.finish(
+                MessageSegment.reply(event.message_id) + MessageSegment.text(m.build())
+            )
+
+    # 命令chu score
+    if result.find("score"):
+        message_occurred()
+        await chu_command.finish(
+            MessageSegment.reply(event.message_id) + MessageSegment.text("🚧施工中~"))
 

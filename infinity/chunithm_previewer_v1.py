@@ -1,17 +1,16 @@
-import asyncio
 import io
 import os
 import re
 
+import httpx
+from PIL import Image
+from bs4 import BeautifulSoup, Comment
 from nonebot import logger
 from pymongo.errors import OperationFailure
-from bs4 import BeautifulSoup, Comment
-import infinity
-import httpx
-from infinity.model.chunithm_song import ChuniDifficulty
-from infinity import connection
 
-from PIL import Image, ImageDraw
+import infinity
+from infinity import connection
+from infinity.model.chunithm_song import ChuniDifficulty
 
 
 def svdxin_version(version: int) -> str:
@@ -75,10 +74,35 @@ def difficulty_to_short(difficulty: ChuniDifficulty | int) -> str:
         case _:
             return ""
 
+
 async def sdvxin_automatic_v1():
     # 自动从sdvx.in网站爬取所有曲目的sdvxin_id
-    level_names = ["1", "2", "3", "4", "5", "6", "7", "7+", "8", "8+", "9", "9+", "10", "10+", "11", "11+", "12", "12+",
-                   "13", "13+", "14", "14+", "15", "15+"]
+    level_names = [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "7+",
+        "8",
+        "8+",
+        "9",
+        "9+",
+        "10",
+        "10+",
+        "11",
+        "11+",
+        "12",
+        "12+",
+        "13",
+        "13+",
+        "14",
+        "14+",
+        "15",
+        "15+",
+    ]
     # 遍历等级名称
     for level_name in level_names:
         logger.info(f"==={level_name}===")
@@ -95,7 +119,7 @@ async def sdvxin_automatic_v1():
             # 找到注释后，获取其前一个<script>标签的src属性值
             script_tag = comment.find_previous_sibling("script")
             # 获取到脚本名，从脚本名中得到歌曲的sdvxin_id
-            match = re.search(r'SORT(\d+)\w+\(\);', script_tag.string)
+            match = re.search(r"SORT(\d+)\w+\(\);", script_tag.string)
             if match:
                 try:
                     sdvxin_id = match.group(1)
@@ -110,16 +134,16 @@ async def sdvxin_automatic_v1():
                                 "song_name": comment.string,
                                 "sdvxin_id": sdvxin_id,
                             },
-
                         )
                     logger.debug(f"{comment} {sdvxin_id} 存入成功")
                 except OperationFailure:
                     logger.warning(f"{comment}存入失败")
 
+
 async def get_chunithm_preview_v1(mid: int, difficulty: ChuniDifficulty | int = 3):
     # 查找缓存中是否包含该歌曲的图片缓存，如果有则直接返回
     d = difficulty_to_short(difficulty)
-    if not os.path.exists(f"./cache"):
+    if not os.path.exists("./cache"):
         os.mkdir("./cache")
     if os.path.exists(f"./cache/chunithm_chart_preview_{mid}_{d}.png"):
         with open(f"./cache/chunithm_chart_preview_{mid}_{d}.png", "rb") as f:
@@ -128,17 +152,18 @@ async def get_chunithm_preview_v1(mid: int, difficulty: ChuniDifficulty | int = 
     sd = await connection.query_chunithm_song_by_id(mid)
     if sd:
         # 根据歌曲id查询sdvxin_id
-        res = await connection.chunithm_sdvxin_mapping_collection.find_one({"song_id": mid})
+        res = await connection.chunithm_sdvxin_mapping_collection.find_one(
+            {"song_id": mid}
+        )
         if res:
             # 根据sdvxin_id查询sdvx.in网站的预览图
-            url1 = f"{infinity.sdvxin_api}chunithm/{str(svdxin_version(sd.version)) if d != "ult" else "ult"}/bg/{res["sdvxin_id"]}bg.png"
-            url2 = f"{infinity.sdvxin_api}chunithm/{str(svdxin_version(sd.version)) if d != "ult" else "ult"}/obj/data{res["sdvxin_id"]}{d}.png"
+            url1 = f"{infinity.sdvxin_api}chunithm/{str(svdxin_version(sd.version)) if d != 'ult' else 'ult'}/bg/{res['sdvxin_id']}bg.png"
+            url2 = f"{infinity.sdvxin_api}chunithm/{str(svdxin_version(sd.version)) if d != 'ult' else 'ult'}/obj/data{res['sdvxin_id']}{d}.png"
             # print(url1, url2)
             # 获取两张图片，如果状态为200则返回图片链接
             async with httpx.AsyncClient() as client:
                 res1 = await client.get(url1)
                 res2 = await client.get(url2)
-                print(res1.status_code, res2.status_code)
                 if res1.status_code == 200 and res2.status_code == 200:
                     # 使用BytesIO将响应内容转换为文件对象
                     bg_io = io.BytesIO(res1.content)
